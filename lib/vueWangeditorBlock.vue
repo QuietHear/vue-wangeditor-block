@@ -4,7 +4,7 @@
 */
 /*
  * @LastEditors: afei
- * @LastEditTime: 2020-12-31 15:40:17
+ * @LastEditTime: 2020-12-31 16:53:34
 */
 <template>
   <div :class="['vue-wangeditor-block', cname]">
@@ -16,6 +16,7 @@
 <script>
 import E from "wangeditor";
 import xss from "xss";
+import i18next from "i18next";
 export default {
   name: "vueWangeditorBlock",
   model: {
@@ -41,6 +42,16 @@ export default {
       // 数据绑定与返回设置为json格式
       type: Boolean,
       default: false,
+    },
+    i18next: {
+      // 标题开启国际化
+      type: Boolean,
+      default: false,
+    },
+    language: {
+      // 设置语言种类
+      type: String,
+      default: "zh-CN",
     },
     diyAlert: {
       // 自定义提示事件
@@ -84,6 +95,44 @@ export default {
     };
   },
   methods: {
+    // 初始化
+    init() {
+      if (!this.onlyShow) {
+        this.example = new E(document.getElementById(this.id));
+        for (let keys in this.extraConfig) {
+          this.example.config[keys] = this.extraConfig[keys];
+        }
+        // 语言
+        if (this.i18next) {
+          this.example.config.lang = this.language;
+          this.example.i18next = i18next;
+        }
+        // 鼠标进入
+        this.example.config.onfocus = this.focusInput;
+        // 鼠标移出
+        this.example.config.onblur = this.blurInput;
+        // 改变事件
+        this.example.config.onchange = this.msgChange;
+        // 自定义提示消息
+        this.example.config.customAlert = this.diyAlert
+          ? this.diyAlert
+          : this.alertMsg;
+        // 上传本地图片url
+        this.example.config.uploadImgServer = this.uploadUrl;
+        // 接口请求参数
+        this.example.config.uploadImgParams = { ...this.httpParams };
+        // 自定义上传方法
+        if (this.diyUploadImg) {
+          this.example.config.customUploadImg = this.diyUploadImg;
+        }
+        this.example.create();
+        if (this.jsonModel) {
+          this.example.txt.setJSON(this.content);
+        } else {
+          this.example.txt.html(this.content);
+        }
+      }
+    },
     // 内容改变
     msgChange(value) {
       this.$emit(
@@ -129,36 +178,12 @@ export default {
     },
   },
   mounted() {
-    if (!this.onlyShow) {
-      this.example = new E(document.getElementById(this.id));
-      for (let keys in this.extraConfig) {
-        this.example.config[keys] = this.extraConfig[keys];
-      }
-      // 鼠标进入
-      this.example.config.onfocus = this.focusInput;
-      // 鼠标移出
-      this.example.config.onblur = this.blurInput;
-      // 改变事件
-      this.example.config.onchange = this.msgChange;
-      // 自定义提示消息
-      this.example.config.customAlert = this.diyAlert
-        ? this.diyAlert
-        : this.alertMsg;
-      // 上传本地图片url
-      this.example.config.uploadImgServer = this.uploadUrl;
-      // 接口请求参数
-      this.example.config.uploadImgParams = { ...this.httpParams };
-      // 自定义上传方法
-      if (this.diyUploadImg) {
-        this.example.config.customUploadImg = this.diyUploadImg;
-      }
-      this.example.create();
-      if (this.jsonModel) {
-        this.example.txt.setJSON(this.content);
-      } else {
-        this.example.txt.html(this.content);
-      }
-    }
+    this.init();
+  },
+  watch: {
+    language() {
+      this.init();
+    },
   },
 };
 </script>
