@@ -4,7 +4,7 @@
 */
 /*
  * @LastEditors: afei
- * @LastEditTime: 2020-12-31 16:53:34
+ * @LastEditTime: 2020-12-31 17:08:59
 */
 <template>
   <div :class="['vue-wangeditor-block', cname]">
@@ -91,7 +91,7 @@ export default {
   },
   data() {
     return {
-      example: "",
+      example: null,
     };
   },
   methods: {
@@ -182,8 +182,17 @@ export default {
   },
   watch: {
     language() {
-      this.init();
+      if (!this.onlyShow) {
+        this.init();
+      }
     },
+  },
+  beforeDestroy() {
+    // 销毁编辑器
+    if (!this.onlyShow) {
+      this.example.destroy();
+      this.example = null;
+    }
   },
 };
 </script>
