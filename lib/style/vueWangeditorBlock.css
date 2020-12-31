@@ -4,8 +4,36 @@
 */
 /*
  * @LastEditors: afei
- * @LastEditTime: 2020-12-30 14:15:27
+ * @LastEditTime: 2020-12-31 15:40:39
 */
-.vue-wangeditor-block.only-show .edui-editor {
-  border: 0 !important;
+.vue-wangeditor-block .w-e-text ul {
+  list-style: disc;
+}
+.vue-wangeditor-block .w-e-text ul li {
+  list-style: disc;
+}
+.vue-wangeditor-block .w-e-text ol {
+  list-style: decimal;
+}
+.vue-wangeditor-block .w-e-text ol li {
+  list-style: decimal;
+}
+.vue-wangeditor-block .w-e-text b {
+  font-style: inherit;
+  font-weight: bold;
+}
+.vue-wangeditor-block .w-e-text i {
+  font-style: italic;
+  font-weight: inherit;
+}
+.vue-wangeditor-block .w-e-text h1,
+.vue-wangeditor-block .w-e-text h2,
+.vue-wangeditor-block .w-e-text h3,
+.vue-wangeditor-block .w-e-text h4,
+.vue-wangeditor-block .w-e-text h5 {
+  font-style: inherit;
+  font-weight: bold;
+}
+.vue-wangeditor-block .w-e-text a:hover {
+  text-decoration: underline;
 }

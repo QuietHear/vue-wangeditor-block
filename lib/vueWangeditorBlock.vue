@@ -4,46 +4,47 @@
 */
 /*
  * @LastEditors: afei
- * @LastEditTime: 2020-12-30 14:15:35
+ * @LastEditTime: 2020-12-31 15:40:17
 */
 <template>
-  <vue-ueditor-wrap
-    :class="['vue-wangeditor-block', onlyShow ? 'only-show' : '', cname]"
-    v-model="msg"
-    :config="config"
-    @ready="ready"
-    :init="myInit"
-  ></vue-ueditor-wrap>
+  <div :class="['vue-wangeditor-block', cname]">
+    <div :id="id" v-if="!onlyShow"></div>
+    <div class="w-e-text" v-html="content" v-else></div>
+  </div>
 </template>
 
 <script>
-// 1、引入VueUeditorWrap组件
-import VueUeditorWrap from "vue-ueditor-wrap";
-
+import E from "wangeditor";
+import xss from "xss";
 export default {
   name: "vueWangeditorBlock",
-  // 2、注册组件
-  components: {
-    VueUeditorWrap,
-  },
   model: {
     prop: "content",
     event: "changeValue",
   },
   props: {
+    id: {
+      // 组件唯一值
+      type: String,
+      required: true,
+    },
     content: {
       type: String,
       default: "",
-    },
-    staticUrl: {
-      // 静态资源文件地址
-      type: String,
-      default: "/static/UEditor/",
     },
     cname: {
       // 额外class
       type: String,
       default: "",
+    },
+    jsonModel: {
+      // 数据绑定与返回设置为json格式
+      type: Boolean,
+      default: false,
+    },
+    diyAlert: {
+      // 自定义提示事件
+      type: Function,
     },
     uploadUrl: {
       // 图片上传的接口
@@ -54,126 +55,110 @@ export default {
       // 请求附带参数
       type: Object,
       default: function () {
+        return {};
+      },
+    },
+    diyUploadImg: {
+      // 自定义上传图片事件
+      type: Function,
+    },
+    extraConfig: {
+      // wangeditor配置项
+      type: Object,
+      default: function () {
         return {
-          none: true,
+          placeholder: "", // 空值提示字
+          focus: true, // 初始化是否自动鼠标聚焦
         };
       },
     },
     onlyShow: {
-      // 只展示内容，不展示菜单
+      // 只展示内容
       type: Boolean,
       default: false,
-    },
-    extraConfig: {
-      // ueditor配置项
-      type: Object,
-      default: function () {
-        return {};
-      },
     },
   },
   data() {
     return {
-      // 3、v-model绑定数据
-      msg: "",
-      // 4、根据项目需求自行配置,具体配置参见ueditor.config.js源码或 http://fex.baidu.com/ueditor/#start-start
-      config: {
-        // 如果需要上传功能,找后端小伙伴要服务器接口地址
-        serverUrl: this.uploadUrl,
-        // 你的UEditor资源存放的路径,相对于打包后的index.html
-        UEDITOR_HOME_URL: this.staticUrl,
-        // 编辑器不自动被内容撑高
-        autoHeightEnabled: false,
-        // 定制菜单
-        toolbars: [
-          [
-            "fullscreen",
-            "bold",
-            "italic",
-            "underline",
-            "fontsize",
-            "insertimage",
-            "insertorderedlist",
-            "insertunorderedlist",
-          ],
-          ["source"], // 调试时候使用
-        ],
-        // 初始容器高度
-        initialFrameHeight: 240,
-        // 初始容器宽度
-        initialFrameWidth: "100%",
-        // 关闭自动保存
-        enableAutoSave: false,
-        // 是否启用元素路径
-        elementPathEnabled: false,
-        // 内容只读
-        readonly: false,
-        // 开启字数统计
-        wordCount: true,
-      },
       example: "",
     };
   },
   methods: {
-    // 5、 你可以在ready方法中拿到editorInstance实例,之后的所有API就和官方的实例一样了,Just Do What You Want! http://fex.baidu.com/ueditor/#api-common
-    ready(ue) {
-      this.example = ue;
-      if (!this.httpParams.none) {
-        ue.execCommand("serverparam", this.httpParams);
+    // 内容改变
+    msgChange(value) {
+      this.$emit(
+        "changeValue",
+        this.jsonModel ? this.example.txt.getJSON() : xss(value)
+      );
+      this.$emit(
+        "change",
+        this.jsonModel ? this.example.txt.getJSON() : xss(value)
+      );
+    },
+    // 鼠标在输入框聚焦
+    focusInput(value) {
+      this.$emit(
+        "focus",
+        this.jsonModel ? this.example.txt.getJSON() : xss(value)
+      );
+    },
+    // 鼠标在输入框失去焦点
+    blurInput(value) {
+      this.$emit(
+        "blur",
+        this.jsonModel ? this.example.txt.getJSON() : xss(value)
+      );
+    },
+    // 返回错误信息
+    alertMsg(message, type) {
+      switch (type) {
+        case "success":
+        case "info":
+        case "warning":
+        case "error":
+          this.$message({ type: type, message: message });
+          break;
+        default:
+          this.$message(message);
+          break;
       }
-      ue.addListener("contentChange", this.msgChange);
-      ue.addListener("catchRemoteImage", this.msgChange);
     },
-    msgChange() {
-      this.$emit("changeValue", this.msg);
-      this.$emit("change", this.msg);
-    },
-    // 6. 结合init方法,自定义按钮
-    myInit() {
-      // this.$refs.ueditor.forEach((vm) => {
-      //   vm.registerButton({
-      //     name: 'test',
-      //     icon: './public/test-button.png',
-      //     tip: 'this is a test tip',
-      //     handler: (editor, name) => {
-      //       editor.execCommand('inserthtml', `<span>text inserted by test button</span>`)
-      //     }
-      //   })
-      //   vm.registerButton({
-      //     name: 'center',
-      //     icon: './public/center.png',
-      //     tip: '表格居中',
-      //     handler: (editor, name) => {
-      //       var tables = editor.document.querySelectorAll('table')
-      //       if (tables.length) {
-      //         tables.forEach((table) => {
-      //           table.style.margin = '0 auto'
-      //         })
-      //       } else {
-      //         editor.trigger('showmessage', {
-      //           content: '没有表格',
-      //           timeout: 2000
-      //         })
-      //       }
-      //     }
-      //   })
-      // })
-    },
+    // 返回实例
     getExample() {
       return this.example;
     },
   },
-  created() {
-    if (this.onlyShow) {
-      this.config.autoHeightEnabled = true;
-      this.config.toolbars = [];
-      this.config.wordCount = false;
-      this.config.readonly = true;
+  mounted() {
+    if (!this.onlyShow) {
+      this.example = new E(document.getElementById(this.id));
+      for (let keys in this.extraConfig) {
+        this.example.config[keys] = this.extraConfig[keys];
+      }
+      // 鼠标进入
+      this.example.config.onfocus = this.focusInput;
+      // 鼠标移出
+      this.example.config.onblur = this.blurInput;
+      // 改变事件
+      this.example.config.onchange = this.msgChange;
+      // 自定义提示消息
+      this.example.config.customAlert = this.diyAlert
+        ? this.diyAlert
+        : this.alertMsg;
+      // 上传本地图片url
+      this.example.config.uploadImgServer = this.uploadUrl;
+      // 接口请求参数
+      this.example.config.uploadImgParams = { ...this.httpParams };
+      // 自定义上传方法
+      if (this.diyUploadImg) {
+        this.example.config.customUploadImg = this.diyUploadImg;
+      }
+      this.example.create();
+      if (this.jsonModel) {
+        this.example.txt.setJSON(this.content);
+      } else {
+        this.example.txt.html(this.content);
+      }
     }
-    for (let key in this.extraConfig) {
-      this.config[key] = this.extraConfig[key];
-    }
-    this.msg = this.content;
   },
 };
 </script>

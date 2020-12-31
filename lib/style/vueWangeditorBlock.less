@@ -4,12 +4,38 @@
 */
 /*
  * @LastEditors: afei
- * @LastEditTime: 2020-12-30 14:15:27
+ * @LastEditTime: 2020-12-31 15:40:39
 */
 .vue-wangeditor-block{
-    &.only-show{
-        .edui-editor {
-            border: 0 !important;
+    .w-e-text{
+        ul{
+            list-style: disc;
+            li{
+                list-style: disc;
+            }
+        }
+        ol{
+            list-style: decimal;
+            li{
+                list-style: decimal;
+             }
+        }
+        b{
+            font-style: inherit;
+            font-weight: bold;
+        }
+        i{
+             font-style: italic;
+             font-weight: inherit;
+         }
+        h1,h2,h3,h4,h5{
+            font-style: inherit;
+            font-weight: bold;
+        }
+        a{
+            &:hover{
+                text-decoration: underline;
+            }
         }
     }
 }

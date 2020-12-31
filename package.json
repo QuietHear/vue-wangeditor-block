@@ -33,7 +33,9 @@
     "vue-loader": "^13.0.5",
     "vue-style-loader": "^3.0.1",
     "vue-template-compiler": "^2.4.4",
+    "wangeditor": "^4.6.0",
     "webpack": "^3.6.0",
-    "webpack-dev-server": "^2.9.1"
+    "webpack-dev-server": "^2.9.1",
+    "xss": "^1.0.8"
   }
 }
