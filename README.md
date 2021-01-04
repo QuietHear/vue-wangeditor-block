@@ -8,18 +8,20 @@
 * 安装依赖 `npm i xss`
 * 选择安装 `npm i element-ui`
 * 选择安装 `npm i i18next`
+* 选择安装 `npm i highlight.js`
 
 ### 1. 参数
 * `id`：组件唯一值-->String;必传;
 * `v-model`：输入区对应的内容，双向绑定-->String;非必传
 * `cname`：自定义class-->String;非必传
 * `json-model`：数据绑定与返回设置为json格式-->Boolean;非必传;默认false
-* `i18next`：标题开启国际化，如果开始必须安装依赖-->Boolean;非必传;默认false
+* `i18next`：标题开启国际化，如果开启必须安装*i18next*依赖-->Boolean;非必传;默认false
 * `language`：设置语言种类-->String;非必传;默认'zh-CN'
 >
 	zh-CN/en
 >
 
+* `highlight`：代码高亮，如果开启必须安装*highlight.js*依赖-->Boolean;非必传;默认false
 * `diy-alert`：自定义提示事件-->Function;非必传;默认使用element的$message
 * `upload-url`：图片上传的接口,后端要看最后的文档-->String;非必传
 * `http-params`：请求附带参数-->Object;非必传

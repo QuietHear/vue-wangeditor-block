@@ -4,7 +4,7 @@
 */
 /*
  * @LastEditors: afei
- * @LastEditTime: 2020-12-31 17:08:59
+ * @LastEditTime: 2021-01-04 10:01:20
 */
 <template>
   <div :class="['vue-wangeditor-block', cname]">
@@ -15,8 +15,13 @@
 
 <script>
 import E from "wangeditor";
+// xss安全
 import xss from "xss";
+// 国际化
 import i18next from "i18next";
+// 代码高亮
+import hljs from "highlight.js";
+import "highlight.js/styles/monokai-sublime.css";
 export default {
   name: "vueWangeditorBlock",
   model: {
@@ -52,6 +57,11 @@ export default {
       // 设置语言种类
       type: String,
       default: "zh-CN",
+    },
+    highlight: {
+      // 代码高亮
+      type: Boolean,
+      default: false,
     },
     diyAlert: {
       // 自定义提示事件
@@ -106,6 +116,10 @@ export default {
         if (this.i18next) {
           this.example.config.lang = this.language;
           this.example.i18next = i18next;
+        }
+        // 代码高亮
+        if (this.highlight) {
+          this.example.highlight = hljs;
         }
         // 鼠标进入
         this.example.config.onfocus = this.focusInput;
