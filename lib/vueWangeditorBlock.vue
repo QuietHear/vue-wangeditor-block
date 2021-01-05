@@ -4,7 +4,7 @@
 */
 /*
  * @LastEditors: afei
- * @LastEditTime: 2021-01-04 10:01:20
+ * @LastEditTime: 2021-01-05 09:45:01
 */
 <template>
   <div :class="['vue-wangeditor-block', cname]">
@@ -15,13 +15,11 @@
 
 <script>
 import E from "wangeditor";
+const { $, BtnMenu, DropListMenu, PanelMenu, DropList, Panel, Tooltip } = E;
 // xss安全
 import xss from "xss";
 // 国际化
 import i18next from "i18next";
-// 代码高亮
-import hljs from "highlight.js";
-import "highlight.js/styles/monokai-sublime.css";
 export default {
   name: "vueWangeditorBlock",
   model: {
@@ -48,6 +46,11 @@ export default {
       type: Boolean,
       default: false,
     },
+    openXss: {
+      // xss防护
+      type: Boolean,
+      default: true,
+    },
     i18next: {
       // 标题开启国际化
       type: Boolean,
@@ -57,11 +60,6 @@ export default {
       // 设置语言种类
       type: String,
       default: "zh-CN",
-    },
-    highlight: {
-      // 代码高亮
-      type: Boolean,
-      default: false,
     },
     diyAlert: {
       // 自定义提示事件
@@ -82,6 +80,13 @@ export default {
     diyUploadImg: {
       // 自定义上传图片事件
       type: Function,
+    },
+    diyMenus: {
+      // 自定义菜单列表
+      type: Array,
+      default: () => {
+        return [];
+      },
     },
     extraConfig: {
       // wangeditor配置项
@@ -109,6 +114,13 @@ export default {
     init() {
       if (!this.onlyShow) {
         this.example = new E(document.getElementById(this.id));
+        // 扩展菜单
+        this.diyMenus.forEach((item) => {
+          if (item.key) {
+            this.extendMenus(item);
+          }
+        });
+        // 设置配置
         for (let keys in this.extraConfig) {
           this.example.config[keys] = this.extraConfig[keys];
         }
@@ -116,10 +128,6 @@ export default {
         if (this.i18next) {
           this.example.config.lang = this.language;
           this.example.i18next = i18next;
-        }
-        // 代码高亮
-        if (this.highlight) {
-          this.example.highlight = hljs;
         }
         // 鼠标进入
         this.example.config.onfocus = this.focusInput;
@@ -147,29 +155,111 @@ export default {
         }
       }
     },
+    // 自定义扩展菜单
+    extendMenus(item) {
+      let it = this;
+      if (item.menuType === "list") {
+        // 列表类型
+        class menuItem extends DropListMenu {
+          constructor(editor) {
+            const $elem = E.$(
+              `<div class="w-e-menu" title="${item.title}" data-title="${item.title}">
+                ${item.text}
+            </div>`
+            );
+            // 标题必须添加到菜单里
+            item.listTitle = item.listTitle ? item.listTitle : "";
+            editor.config.languages["zh-CN"].wangEditor.menus.dropListMenu[
+              item.listTitle
+            ] = item.listTitle;
+            editor.config.languages["en"].wangEditor.menus.dropListMenu[
+              item.listTitle
+            ] = item.listTitleEn ? item.listTitleEn : item.listTitle;
+            const dropListConf = {
+              width: item.listWidth ? item.listWidth : 100,
+              title: item.listTitle,
+              type: "list",
+              list: item.listMap
+                ? item.listMap.map((one) => {
+                    return { $elem: E.$(one.key), value: one.value };
+                  })
+                : [],
+              // 菜单列表item点击事件
+              clickHandler: (value) => {
+                it.$emit(item.key + "Click", value, this, it);
+              },
+            };
+            super($elem, editor, dropListConf);
+          }
+          // 激活检测
+          tryChangeActive() {
+            it.$emit(item.key + "CheckActive", this, it);
+          }
+        }
+        this.example.menus.extend(item.key, menuItem);
+      } else {
+        // 普通类型
+        class menuItem extends BtnMenu {
+          constructor(editor) {
+            const $elem = E.$(
+              `<div class="w-e-menu" title="${item.title}" data-title="${item.title}">
+                ${item.text}
+            </div>`
+            );
+            super($elem, editor);
+          }
+          // 菜单点击事件
+          clickHandler() {
+            it.$emit(item.key + "Click", this, it);
+          }
+          // 激活检测
+          tryChangeActive() {
+            it.$emit(item.key + "CheckActive", this, it);
+          }
+        }
+        this.example.menus.extend(item.key, menuItem);
+      }
+      this.example.config.menus = this.example.config.menus.concat(item.key);
+    },
     // 内容改变
     msgChange(value) {
       this.$emit(
         "changeValue",
-        this.jsonModel ? this.example.txt.getJSON() : xss(value)
+        this.jsonModel
+          ? this.example.txt.getJSON()
+          : this.openXss
+          ? xss(value)
+          : value
       );
       this.$emit(
         "change",
-        this.jsonModel ? this.example.txt.getJSON() : xss(value)
+        this.jsonModel
+          ? this.example.txt.getJSON()
+          : this.openXss
+          ? xss(value)
+          : value
       );
     },
     // 鼠标在输入框聚焦
     focusInput(value) {
       this.$emit(
         "focus",
-        this.jsonModel ? this.example.txt.getJSON() : xss(value)
+        this.jsonModel
+          ? this.example.txt.getJSON()
+          : this.openXss
+          ? xss(value)
+          : value
       );
     },
     // 鼠标在输入框失去焦点
     blurInput(value) {
       this.$emit(
         "blur",
-        this.jsonModel ? this.example.txt.getJSON() : xss(value)
+        this.jsonModel
+          ? this.example.txt.getJSON()
+          : this.openXss
+          ? xss(value)
+          : value
       );
     },
     // 返回错误信息
