@@ -4,12 +4,12 @@
 */
 /*
  * @LastEditors: afei
- * @LastEditTime: 2021-01-05 09:45:01
+ * @LastEditTime: 2021-01-13 10:48:16
 */
 <template>
   <div :class="['vue-wangeditor-block', cname]">
     <div :id="id" v-if="!onlyShow"></div>
-    <div class="w-e-text" v-html="content" v-else></div>
+    <div class="w-e-text full" v-html="content" v-else></div>
   </div>
 </template>
 
@@ -288,6 +288,13 @@ export default {
     language() {
       if (!this.onlyShow) {
         this.init();
+      }
+    },
+    onlyShow() {
+      if (!this.onlyShow) {
+        this.$nextTick(() => {
+          this.init();
+        });
       }
     },
   },

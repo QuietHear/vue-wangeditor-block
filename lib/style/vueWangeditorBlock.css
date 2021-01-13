@@ -4,10 +4,16 @@
 */
 /*
  * @LastEditors: afei
- * @LastEditTime: 2021-01-04 14:49:15
+ * @LastEditTime: 2021-01-13 11:02:46
 */
+.vue-wangeditor-block .w-e-toolbar {
+  z-index: 11 !important;
+}
 .vue-wangeditor-block .w-e-toolbar .w-e-active button {
   color: #1e88e5;
+}
+.vue-wangeditor-block .w-e-text-container {
+  z-index: 10 !important;
 }
 .vue-wangeditor-block .w-e-text ul {
   list-style: disc;
@@ -39,4 +45,7 @@
 }
 .vue-wangeditor-block .w-e-text a:hover {
   text-decoration: underline;
+}
+.vue-wangeditor-block .w-e-text.full {
+  padding: 0;
 }
