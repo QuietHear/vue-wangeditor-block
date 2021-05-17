@@ -4,7 +4,7 @@
 */
 /*
  * @LastEditors: afei
- * @LastEditTime: 2021-01-13 10:48:16
+ * @LastEditTime: 2021-05-17 15:13:30
 */
 <template>
   <div :class="['vue-wangeditor-block', cname]">
@@ -108,6 +108,37 @@ export default {
     return {
       example: null,
     };
+  },
+  watch: {
+    language() {
+      if (!this.onlyShow) {
+        this.init();
+      }
+    },
+    onlyShow() {
+      if (!this.onlyShow) {
+        this.$nextTick(() => {
+          this.init();
+        });
+      } else {
+        if (this.example) {
+          this.example.destroy();
+          this.example = null;
+        }
+      }
+    },
+    content() {
+      if (!this.onlyShow) {
+        if (this.jsonModel) {
+          this.example.txt.setJSON(this.content);
+        } else {
+          this.example.txt.html(this.content);
+        }
+      }
+    },
+  },
+  mounted() {
+    this.init();
   },
   methods: {
     // 初始化
@@ -239,6 +270,7 @@ export default {
           ? xss(value)
           : value
       );
+      this.$parent.clearValidate && this.$parent.clearValidate();
     },
     // 鼠标在输入框聚焦
     focusInput(value) {
@@ -279,23 +311,6 @@ export default {
     // 返回实例
     getExample() {
       return this.example;
-    },
-  },
-  mounted() {
-    this.init();
-  },
-  watch: {
-    language() {
-      if (!this.onlyShow) {
-        this.init();
-      }
-    },
-    onlyShow() {
-      if (!this.onlyShow) {
-        this.$nextTick(() => {
-          this.init();
-        });
-      }
     },
   },
   beforeDestroy() {
