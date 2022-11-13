@@ -1,8 +1,15 @@
 # wangeditor组件 vue2版(包含防止xss攻击)
 [**vue3版本**](https://github.com/QuietHear/vue-wangeditor-block-plus '浏览') | ***vue2版本*** 
 
+
 ## 安装
 	npm i vue-wangeditor-block
+
+## 使用
+	import vueWangeditorBlock from 'vue-wangeditor-block';
+	
+	Vue.use(vueWangeditorBlock);
+
 
 ## 0. 依赖组件
 >
@@ -10,6 +17,7 @@
 	wangeditor、xss、i18next
 >
 * 选择安装 `npm i element-ui`
+
 
 ## 1. 参数
 * `id`：组件唯一值-->String;必传;
@@ -87,8 +95,10 @@
 * `@blur`：鼠标在输入框失去焦点-->返回当前内容
 * `@change`：内容改变监听-->返回当前内容
 
+
 ## 2. 方法
 * `getExample`：获取当前ueditor的实例，可以使用其API
+
 
 ## 3. 组件预设wangeditor配置项
 	// 空值提示字
@@ -96,11 +106,14 @@
 	// 初始化是否自动鼠标聚焦
 	focus: true, 
 
+
 ## 4. 注意事项
 extra-config传入的配置中`onfocus`、`onblur`、`onchange`、`customAlert`、`uploadImgServer`、`uploadImgParams`、`customUploadImg`是不会生效的，必须使用对应参数才行
 
+
 ## 5. 官方文档
 [http://www.wangeditor.com/doc/](http://www.wangeditor.com/doc/ '文档')
+
 
 ## todo:
 自定义菜单目前只扩展了普通按键与下拉列表,其他的还未实现
